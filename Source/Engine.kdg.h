@@ -11,6 +11,17 @@
 #endif
 
 typedef struct {
+	Uint8* buffer;
+	size_t capacity;
+	size_t size;
+} KDG_Arena;
+
+bool KDG_InitializeArena(KDG_Arena* arena, size_t capacity);
+void* KDG_AllocateFromArena(KDG_Arena* arena, size_t size, size_t alignment);
+void KDG_ResetArena(KDG_Arena* arena);
+void KDG_CleanupArena(KDG_Arena* arena);
+
+typedef struct {
 	SDL_Window* window;
 	SDL_GLContext glContext;
 } KDG_EngineState;

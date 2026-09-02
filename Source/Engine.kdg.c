@@ -1,5 +1,37 @@
 #include "Engine.kdg.h"
 
+bool KDG_InitializeArena(KDG_Arena* arena, size_t capacity) {
+	size_t remainder = capacity % 64;
+	if (remainder)
+		capacity += 64 - remainder;
+	arena->buffer = SDL_aligned_alloc(64, capacity);
+	if (!arena->buffer) {
+		return false;
+	}
+	SDL_memset(arena->buffer, 0, capacity);
+	arena->capacity = capacity;
+	return true;
+}
+
+void* KDG_AllocateFromArena(KDG_Arena* arena, size_t size, size_t alignment) {
+	size_t aligned = (arena->size + (alignment - 1)) & ~(alignment - 1);
+	if (aligned + size > arena->capacity) {
+		return nullptr;
+	}
+	Uint8* ptr = &(arena->buffer)[aligned];
+	arena->size = aligned + size;
+	return ptr;
+}
+
+void KDG_ResetArena(KDG_Arena* arena) {
+	arena->size = 0;
+}
+
+void KDG_CleanupArena(KDG_Arena* arena) {
+	if (arena->buffer)
+		SDL_aligned_free(arena->buffer);
+}
+
 bool KDG_InitializeEngineState(KDG_EngineState* state, int argc, char** argv) {
 	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		return false;
