@@ -1,5 +1,7 @@
 Vendor/SDL
 
 Build
+*.dll
+*.exe
 
 .cache

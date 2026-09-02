@@ -10,6 +10,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS        OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(CIJ_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 set(CIJ_VENDOR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Vendor")
@@ -21,6 +22,11 @@ add_subdirectory(
 	EXCLUDE_FROM_ALL SYSTEM
 )
 
+add_subdirectory(
+	"${CIJ_VENDOR_DIR}/glad"
+	EXCLUDE_FROM_ALL SYSTEM
+)
+
 add_library(KDG STATIC)
 set_target_properties(
 	KDG PROPERTIES
@@ -28,7 +34,7 @@ set_target_properties(
 )
 file(
 	GLOB_RECURSE KDG_SOURCES CONFIGURE_DEPENDS
-	"${CIJ_SOURCE_DIR}/*.kdg.c"
+	"${CIJ_SOURCE_DIR}/*.kdg.c" 
 	"${CIJ_SOURCE_DIR}/*.kdg.h"
 )
 target_sources(
@@ -44,8 +50,9 @@ target_include_directories(
 	${CIJ_SOURCE_DIR}
 )
 target_link_libraries(
-	KDG PRIVATE
+	KDG PUBLIC
 	SDL3::SDL3
+	glad
 )
 
 add_executable(CIJ)
@@ -65,6 +72,12 @@ target_sources(
 target_link_libraries(
 	CIJ PRIVATE
 	KDG
+)
+install(
+	FILES
+		$<TARGET_FILE:CIJ>
+	DESTINATION
+		"."
 )
 
 file(
@@ -91,4 +104,11 @@ foreach(SCRIPT_SOURCE IN LISTS SCRIPT_SOURCES)
 		${SCRIPT} PRIVATE
 		KDG
 	)
+	install(
+		FILES
+			$<TARGET_FILE:${SCRIPT}>
+		DESTINATION
+			"."
+	)
 endforeach()
+
